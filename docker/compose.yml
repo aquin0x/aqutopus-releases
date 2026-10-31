@@ -1,0 +1,103 @@
+# Monomem Production Docker Compose
+# https://monomem-release.frax.tr
+#
+# Başlatmak için:
+#   docker compose up -d
+#
+# Ayarlar için .env.example dosyasını .env olarak kopyalayın:
+#   cp .env.example .env
+
+name: monomem
+
+networks:
+  monomem-net:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
+  monomem-data:
+    driver: local
+
+services:
+  # -------------------------------------------------------------
+  # 1. Veritabanı: PostgreSQL + pgvector (Hibrit RAG / Tek Hafıza)
+  # -------------------------------------------------------------
+  office-db:
+    image: ${POSTGRES_IMAGE:-ghcr.io/aquin0x/monomem-postgres:latest}
+    container_name: monomem-db
+    restart: unless-stopped
+    networks:
+      - monomem-net
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-office}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD zorunludur (.env dosyasını kontrol edin)}
+      POSTGRES_DB: ${POSTGRES_DB:-office}
+      TZ: ${TZ:-Europe/Istanbul}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-office} -d ${POSTGRES_DB:-office}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # -------------------------------------------------------------
+  # 2. Çekirdek & Ofis Paneli (Core API + Fastify + Web Panel)
+  # -------------------------------------------------------------
+  core:
+    image: ${CORE_IMAGE:-ghcr.io/aquin0x/monomem-core:latest}
+    container_name: monomem-core
+    restart: unless-stopped
+    depends_on:
+      office-db:
+        condition: service_healthy
+    networks:
+      - monomem-net
+    ports:
+      - "${CORE_PORT:-8788}:8788"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${POSTGRES_USER:-office}:${POSTGRES_PASSWORD}@office-db:5432/${POSTGRES_DB:-office}
+      MCP_SIGNING_KEY: ${MCP_SIGNING_KEY:?MCP_SIGNING_KEY zorunludur}
+      PANEL_URL: ${PANEL_URL:-http://localhost:8788}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_OWNER_ID: ${TELEGRAM_OWNER_ID:-}
+      TZ: ${TZ:-Europe/Istanbul}
+    volumes:
+      - monomem-data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8788/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # -------------------------------------------------------------
+  # 3. Sohbet & Kullanıcı Arayüzü (Next.js Chat App)
+  # -------------------------------------------------------------
+  app:
+    image: ${APP_IMAGE:-ghcr.io/aquin0x/monomem-app:latest}
+    container_name: monomem-app
+    restart: unless-stopped
+    depends_on:
+      core:
+        condition: service_started
+    networks:
+      - monomem-net
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      CORE_URL: http://core:8788
+      DATABASE_URL: postgres://${POSTGRES_USER:-office}:${POSTGRES_PASSWORD}@office-db:5432/${POSTGRES_DB:-office}
+      APP_STATE_SECRET: ${APP_STATE_SECRET:?APP_STATE_SECRET zorunludur}
+      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY:-}
+      TZ: ${TZ:-Europe/Istanbul}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

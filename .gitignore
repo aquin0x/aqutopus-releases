@@ -1,0 +1,14 @@
+# Environment & local files
+.env
+.env.local
+*.local.yml
+
+# Operating system
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & temp
+*.log
+tmp/
+temp/
