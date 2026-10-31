@@ -6,7 +6,7 @@
 # Kullanım:
 #   curl -fsSL https://monomem-release.frax.tr/install.sh | bash
 #   veya:
-#   curl -fsSL https://raw.githubusercontent.com/aquin0x/monomem-releases/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/aquin0x/aqutopus-releases/main/install.sh | bash
 #
 # Etkileşimsiz kullanım:
 #   MONOMEM_YES=1 curl -fsSL https://monomem-release.frax.tr/install.sh | bash
@@ -15,7 +15,7 @@ set -eu
 
 MONOMEM_DIR=${MONOMEM_DIR:-$HOME/monomem}
 YES=${MONOMEM_YES:-0}
-RAW_BASE=${RAW_BASE:-https://raw.githubusercontent.com/aquin0x/monomem-releases/main}
+RAW_BASE=${RAW_BASE:-https://raw.githubusercontent.com/aquin0x/aqutopus-releases/main}
 
 # Renkler ve Yardımcılar
 C_BLUE='\033[0;34m'

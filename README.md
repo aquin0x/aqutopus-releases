@@ -2,7 +2,7 @@
 
 [![Dağıtım Portalı](https://img.shields.io/badge/Portal-monomem--release.frax.tr-blue?style=for-the-badge)](https://monomem-release.frax.tr)
 [![Lisans](https://img.shields.io/badge/Lisans-MIT-green?style=for-the-badge)](LICENSE)
-[![Sürüm](https://img.shields.io/badge/Sürüm-v0.2.11-purple?style=for-the-badge)](https://github.com/aquin0x/monomem-releases/releases)
+[![Sürüm](https://img.shields.io/badge/Sürüm-v0.2.11-purple?style=for-the-badge)](https://github.com/aquin0x/aqutopus-releases/releases)
 
 Tüm **Monomem** platformları (Windows, macOS, Android, Linux, Docker VPS) ve eklentileri için resmi, merkezi ve güvenli indirme/kurulum deposudur.
 
@@ -44,8 +44,8 @@ Sunucunuzda betik kullanmadan el ile ayağa kaldırmak isterseniz:
 
 1. Bu depoyu klonlayın veya doğrudan `docker` klasörünü indirin:
    ```bash
-   git clone https://github.com/aquin0x/monomem-releases.git
-   cd monomem-releases/docker
+   git clone https://github.com/aquin0x/aqutopus-releases.git
+   cd aqutopus-releases/docker
    ```
 
 2. Örnek yapılandırma dosyasını kopyalayın ve anahtarları düzenleyin:
