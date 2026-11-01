@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==============================================================================
-# Monomem Tek Satırlık VPS Kurulum Betiği
+# Aqutopus Tek Satırlık VPS Kurulum Betiği 🐙
 # https://monomem-release.frax.tr
 #
 # Kullanım:
@@ -9,12 +9,12 @@
 #   curl -fsSL https://raw.githubusercontent.com/aquin0x/aqutopus-releases/main/install.sh | bash
 #
 # Etkileşimsiz kullanım:
-#   MONOMEM_YES=1 curl -fsSL https://monomem-release.frax.tr/install.sh | bash
+#   AQUTOPUS_YES=1 curl -fsSL https://monomem-release.frax.tr/install.sh | bash
 # ==============================================================================
 set -eu
 
-MONOMEM_DIR=${MONOMEM_DIR:-$HOME/monomem}
-YES=${MONOMEM_YES:-0}
+AQUTOPUS_DIR=${AQUTOPUS_DIR:-${MONOMEM_DIR:-$HOME/aqutopus}}
+YES=${AQUTOPUS_YES:-${MONOMEM_YES:-0}}
 RAW_BASE=${RAW_BASE:-https://raw.githubusercontent.com/aquin0x/aqutopus-releases/main}
 
 # Renkler ve Yardımcılar
@@ -113,17 +113,17 @@ success "Docker ve Docker Compose hazır."
 # -----------------------------------------------------------------------------
 # 2. Kurulum Klasörü ve Dosyaların İndirilmesi
 # -----------------------------------------------------------------------------
-info "Kurulum klasörü hazırlanıyor: $MONOMEM_DIR"
-mkdir -p "$MONOMEM_DIR"
-cd "$MONOMEM_DIR"
+info "Kurulum klasörü hazırlanıyor: $AQUTOPUS_DIR"
+mkdir -p "$AQUTOPUS_DIR"
+cd "$AQUTOPUS_DIR"
 
 info "Docker Compose dosyaları indiriliyor..."
-curl -fsSL "$RAW_BASE/docker/compose.yml" -o "$MONOMEM_DIR/compose.yml" || die "compose.yml indirilemedi."
+curl -fsSL "$RAW_BASE/docker/compose.yml" -o "$AQUTOPUS_DIR/compose.yml" || die "compose.yml indirilemedi."
 
 # -----------------------------------------------------------------------------
 # 3. .env Dosyası ve Güvenlik Anahtarlarının Üretilmesi
 # -----------------------------------------------------------------------------
-ENV_FILE="$MONOMEM_DIR/.env"
+ENV_FILE="$AQUTOPUS_DIR/.env"
 if [ ! -f "$ENV_FILE" ]; then
   info "Güvenli anahtarlar üretiliyor..."
   _pg_pass=$(rand_secret)
@@ -144,7 +144,7 @@ if [ ! -f "$ENV_FILE" ]; then
   fi
 
   cat > "$ENV_FILE" <<EOF
-# Monomem Otomatik Üretilmiş Yapılandırma
+# Aqutopus Otomatik Üretilmiş Yapılandırma
 # Oluşturulma Tarihi: $(date -u)
 
 POSTGRES_USER=office
@@ -173,9 +173,9 @@ fi
 # -----------------------------------------------------------------------------
 # 4. Servislerin Başlatılması
 # -----------------------------------------------------------------------------
-info "Monomem servisleri başlatılıyor (docker compose pull & up)..."
-docker compose --env-file "$ENV_FILE" -f "$MONOMEM_DIR/compose.yml" pull
-docker compose --env-file "$ENV_FILE" -f "$MONOMEM_DIR/compose.yml" up -d
+info "Aqutopus servisleri başlatılıyor (docker compose pull & up)..."
+docker compose --env-file "$ENV_FILE" -f "$AQUTOPUS_DIR/compose.yml" pull
+docker compose --env-file "$ENV_FILE" -f "$AQUTOPUS_DIR/compose.yml" up -d
 
 # -----------------------------------------------------------------------------
 # 5. Başarı Özeti ve Erişim Bilgisi
@@ -183,14 +183,14 @@ docker compose --env-file "$ENV_FILE" -f "$MONOMEM_DIR/compose.yml" up -d
 _HOST_IP=$(curl -fsS --max-time 3 https://api.ipify.org 2>/dev/null || echo "localhost")
 
 printf "\n"
-success "Monomem başarıyla kuruldu ve başlatıldı!"
+success "Aqutopus başarıyla kuruldu ve başlatıldı!"
 printf "\n"
 printf "  ${C_BOLD}Sohbet Arayüzü:${C_RESET}   http://%s:3000 (veya http://localhost:3000)\n" "$_HOST_IP"
 printf "  ${C_BOLD}Ofis Yönetim Paneli:${C_RESET} http://%s:8788 (veya http://localhost:8788)\n" "$_HOST_IP"
 printf "\n"
-printf "  ${C_BOLD}Kurulum Dizini:${C_RESET}    %s\n" "$MONOMEM_DIR"
-printf "  ${C_BOLD}Durdurmak için:${C_RESET}    cd %s && docker compose down\n" "$MONOMEM_DIR"
-printf "  ${C_BOLD}Logları görmek için:${C_RESET} cd %s && docker compose logs -f\n" "$MONOMEM_DIR"
+printf "  ${C_BOLD}Kurulum Dizini:${C_RESET}    %s\n" "$AQUTOPUS_DIR"
+printf "  ${C_BOLD}Durdurmak için:${C_RESET}    cd %s && docker compose down\n" "$AQUTOPUS_DIR"
+printf "  ${C_BOLD}Logları görmek için:${C_RESET} cd %s && docker compose logs -f\n" "$AQUTOPUS_DIR"
 printf "\n"
 printf "Masaüstü, mobil veya eklenti indirmeleri için:\n"
 printf "${C_BLUE}https://monomem-release.frax.tr${C_RESET}\n\n"
